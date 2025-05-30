@@ -1,1 +1,1 @@
-# medusa-terraform-ecs
+# medusa-terraform-ecsFix AWS credentials
