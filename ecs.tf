@@ -37,7 +37,7 @@ resource "aws_security_group" "ecs_sg" {
     from_port       = var.port
     to_port         = var.port
     protocol        = "tcp"
-    security_groups = [aws_security_group.lb_sg.id]  # only allow from ALB SG
+    security_groups = [aws_security_group.lb_sg.id] # only allow from ALB SG
   }
 
   egress {
@@ -121,8 +121,8 @@ resource "aws_ecs_service" "medusa_service" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = aws_subnet.public.*.id
-    security_groups = [aws_security_group.ecs_sg.id]
+    subnets          = aws_subnet.public.*.id
+    security_groups  = [aws_security_group.ecs_sg.id]
     assign_public_ip = true
   }
 
