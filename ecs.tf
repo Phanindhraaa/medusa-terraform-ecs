@@ -1,16 +1,13 @@
 resource "aws_ecs_cluster" "medusa_cluster" {
   name = var.cluster_name
-}
 
-resource "aws_lb" "alb" {
-  name               = "medusa-alb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.lb_sg.id]
-  subnets            = aws_subnet.public.*.id
+  tags = {
+    Environment = "medusa"
+  }
 }
 
 resource "aws_security_group" "lb_sg" {
+  name   = "medusa-lb-sg"
   vpc_id = aws_vpc.main.id
 
   ingress {
@@ -26,6 +23,45 @@ resource "aws_security_group" "lb_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name = "medusa-lb-sg"
+  }
+}
+
+resource "aws_security_group" "ecs_sg" {
+  name   = "medusa-ecs-sg"
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    from_port       = var.port
+    to_port         = var.port
+    protocol        = "tcp"
+    security_groups = [aws_security_group.lb_sg.id]  # only allow from ALB SG
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "medusa-ecs-sg"
+  }
+}
+
+resource "aws_lb" "alb" {
+  name               = "medusa-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.lb_sg.id]
+  subnets            = aws_subnet.public.*.id
+
+  tags = {
+    Name = "medusa-alb"
+  }
 }
 
 resource "aws_lb_target_group" "tg" {
@@ -38,6 +74,10 @@ resource "aws_lb_target_group" "tg" {
 
   health_check {
     path = "/health"
+  }
+
+  tags = {
+    Name = "medusa-tg"
   }
 }
 
@@ -68,7 +108,7 @@ resource "aws_ecs_task_definition" "medusa_task" {
     }]
     environment = [
       { name = "MEDUSA_ADMIN_CORS", value = "*" },
-      { name = "DATABASE_URL", value = "postgres://user:password@host:5432/dbname" }
+      { name = "DATABASE_URL", value = var.database_url }
     ]
   }])
 }
@@ -82,7 +122,7 @@ resource "aws_ecs_service" "medusa_service" {
 
   network_configuration {
     subnets         = aws_subnet.public.*.id
-    security_groups = [aws_security_group.lb_sg.id]
+    security_groups = [aws_security_group.ecs_sg.id]
     assign_public_ip = true
   }
 
@@ -92,4 +132,3 @@ resource "aws_ecs_service" "medusa_service" {
     container_port   = var.port
   }
 }
-
