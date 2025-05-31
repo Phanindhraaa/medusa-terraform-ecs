@@ -65,11 +65,10 @@ resource "aws_lb" "alb" {
 }
 
 resource "aws_lb_target_group" "tg" {
-  name     = "medusa-tg"
-  port     = var.port
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.main.id
-
+  name        = "medusa-tg"
+  port        = var.port
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.main.id
   target_type = "ip"
 
   health_check {
