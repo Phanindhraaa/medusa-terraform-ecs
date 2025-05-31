@@ -37,7 +37,7 @@ resource "aws_security_group" "ecs_sg" {
     from_port       = var.port
     to_port         = var.port
     protocol        = "tcp"
-    security_groups = [aws_security_group.lb_sg.id] # only allow from ALB SG
+    security_groups = [aws_security_group.lb_sg.id]
   }
 
   egress {
@@ -72,7 +72,12 @@ resource "aws_lb_target_group" "tg" {
   target_type = "ip"
 
   health_check {
-    path = "/health"
+    path                = "/"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    matcher             = "200"
   }
 
   tags = {
@@ -91,6 +96,11 @@ resource "aws_lb_listener" "listener" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "ecs_logs" {
+  name              = "/ecs/${var.service_name}"
+  retention_in_days = 7
+}
+
 resource "aws_ecs_task_definition" "medusa_task" {
   family                   = var.service_name
   cpu                      = var.cpu
@@ -107,6 +117,8 @@ resource "aws_ecs_task_definition" "medusa_task" {
     }]
     environment = [
       { name = "MEDUSA_ADMIN_CORS", value = "*" },
+      { name = "JWT_SECRET", value = "supersecretjwtkey" },
+      { name = "REDIS_URL", value = "redis://dummy:6379" },
       {
         name = "DATABASE_URL",
         value = format(
@@ -118,10 +130,17 @@ resource "aws_ecs_task_definition" "medusa_task" {
           var.db_name
         )
       }
-    ]
+    ],
+    logConfiguration = {
+      logDriver = "awslogs",
+      options = {
+        awslogs-group         = "/ecs/${var.service_name}",
+        awslogs-region        = var.aws_region,
+        awslogs-stream-prefix = "ecs"
+      }
+    }
   }])
 }
-
 
 resource "aws_ecs_service" "medusa_service" {
   name            = var.service_name
@@ -141,4 +160,6 @@ resource "aws_ecs_service" "medusa_service" {
     container_name   = var.container_name
     container_port   = var.port
   }
+
+  depends_on = [aws_lb_listener.listener]
 }
