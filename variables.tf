@@ -34,3 +34,25 @@ variable "port" {
   default = 9000
 }
 
+# New database variables
+variable "db_name" {
+  default = "medusa_db"
+}
+
+variable "db_username" {
+  default = "medusauser"
+}
+
+variable "db_password" {
+  description = "The password for the Medusa RDS PostgreSQL user"
+  type        = string
+  sensitive   = true
+}
+
+variable "db_instance_class" {
+  default = "db.t3.micro"
+}
+
+variable "db_allocated_storage" {
+  default = 20
+}
