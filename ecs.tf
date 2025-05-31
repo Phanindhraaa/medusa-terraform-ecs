@@ -107,8 +107,8 @@ resource "aws_ecs_task_definition" "medusa_task" {
     }]
     environment = [
       { name = "MEDUSA_ADMIN_CORS", value = "*" },
-      { 
-        name  = "DATABASE_URL", 
+      {
+        name = "DATABASE_URL",
         value = format(
           "postgresql://%s:%s@%s:%d/%s",
           var.db_username,
