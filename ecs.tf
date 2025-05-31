@@ -107,10 +107,21 @@ resource "aws_ecs_task_definition" "medusa_task" {
     }]
     environment = [
       { name = "MEDUSA_ADMIN_CORS", value = "*" },
-      { name = "DATABASE_URL", value = var.database_url }
+      { 
+        name  = "DATABASE_URL", 
+        value = format(
+          "postgresql://%s:%s@%s:%d/%s",
+          var.db_username,
+          var.db_password,
+          aws_db_instance.medusa_rds.address,
+          5432,
+          var.db_name
+        )
+      }
     ]
   }])
 }
+
 
 resource "aws_ecs_service" "medusa_service" {
   name            = var.service_name
