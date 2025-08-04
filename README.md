@@ -30,9 +30,7 @@ Certainly! Here’s a revised “Features” section for your README that gives 
 - **Infrastructure as Code (IaC):**  
   Empowers teams to version, audit, and manage their infrastructure through code, promoting collaboration and repeatability.
 
----
 
-Let me know if you want to further expand on any feature or add more details!
 ## Prerequisites
 
 - [Terraform](https://www.terraform.io/) (v1.0+ recommended)
@@ -71,14 +69,3 @@ Let me know if you want to further expand on any feature or add more details!
 - `outputs.tf`: Resource outputs.
 - `modules/`: Optional directory for reusable Terraform modules.
 
-## Contributing
-
-Contributions, issues, and feature requests are welcome! Please open an issue or submit a pull request for improvements.
-
-## License
-
-Distributed under the MIT License. See `LICENSE` for details.
-
----
-
-Let me know if you want to tailor this further or add sections specific to your ECS setup!
