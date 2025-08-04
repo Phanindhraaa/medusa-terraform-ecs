@@ -6,12 +6,6 @@ This repository provides Terraform configurations for deploying and managing con
 
 ## Features
 
-Certainly! Here’s a revised “Features” section for your README that gives each feature greater emphasis with concise explanations:
-
----
-
-## Features
-
 - **Automated ECS Cluster Provisioning:**  
   Seamlessly set up AWS ECS clusters, services, and task definitions from scratch, eliminating manual configuration and expediting deployment cycles.
 
